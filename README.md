@@ -7,4 +7,24 @@ https://hortonworks.com/downloads/# \
 https://filezilla-project.org \
 https://pig.apache.org  
 ## Method = Tools + Wrap
+The dedup approach was to find a complet dedup read in each pair of the dedup files.
+-- Tasks done on the OS system
+1. Raw data
+Fastq files with a size between 5 and 1.8 Gb.
+2. Creating the files
+From the fastq files where created files with only the reads and with numbered lines.
+2.1 Extracting only the reads
+    awk 'NR % 4==2' filename.fastq > filename.csv
+2.2 Creating the lines numbers
+    nl -s "," filename.csv > filename_numbered.csv
+3. Spliting the files higher than 2Gb
+3.1 Reading the number of lines
+    wc - l filename_numbered.csv
+3.2 Spliting the file
+    split -a -l (numberoflines/2) filename_numbered.csv
+    
+
+
+
+
 
