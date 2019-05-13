@@ -32,13 +32,13 @@ The upload files are processed to produce the dedup files.
 #### 1.1 Move the files to HDFS
     hdfs dfs -put filename_numbered.csv /user/maria_dev
 #### 1.2 Write the script
-        sd1 = LOAD 'Z00065a_R1_numbered.csv' USING PigStorage(',') AS (line:chararray,read:chararray);
-        sd2 = LOAD 'Z00065a_R2_numbered.csv' USING PigStorage(',') AS (line:chararray,read:chararray);
+        sd1 = LOAD 'Z00065a_R1_numbered.csv' USING PigStorage(',') AS (line:int,read:chararray);
+        sd2 = LOAD 'Z00065a_R2_numbered.csv' USING PigStorage(',') AS (line:int,read:chararray);
         --sd1_1 = FOREACH sd1 GENERATE c1,UniqueID(c1) AS id1;
         --sd2_1 = FOREACH sd2 GENERATE c2,UniqueID(c2) AS id2;
         sd3 = JOIN sd1 BY line,sd2 BY line;
-        sd4 = FOREACH sd3 GENERATE $0 as line,CONCAT($1,$3) AS read:chararray;
-        --sd5 = FOREACH sd4 GENERATE line,SUBSTRING(read,24,124) AS read:chararray;
+        sd4 = FOREACH sd3 GENERATE $0 as line:int,CONCAT($1,$3) AS read:chararray;
+        --sd5 = FOREACH sd4 GENERATE line:int,SUBSTRING(read,24,124) AS read:chararray;
         sd6 = GROUP sd4 by read;
         sd7 = FOREACH sd6 GENERATE sd4.line,sd4.read,COUNT(sd4.read) as count;
         sd8 = FILTER sd7 BY count>1;
@@ -46,3 +46,4 @@ The upload files are processed to produce the dedup files.
         -- the commented lines demonstrate how to extract a substring to compare
 #### 1.3 Run the script
         pig -x tez scriptfilename
+The script also show how it can be used to only find for dedup in certain read positions.
